@@ -1,6 +1,8 @@
 package com.example.stock.controllers.adminController;
 
+import com.example.stock.dao.entities.Entrepot;
 import com.example.stock.dao.entities.Product;
+import com.example.stock.service.EntropotManager;
 import com.example.stock.service.ProductManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,9 +13,11 @@ import java.util.Optional;
 
 @PreAuthorize("hasRole('ADMIN')")
 @RestController
-public class ProductController {
+public class HomeController {
     @Autowired
     private ProductManager productManager;
+    @Autowired
+    private EntropotManager entropotManager;
     @GetMapping("/products")
     public List<Product> showProducts(){
         List<Product> list = productManager.getAll();
@@ -37,9 +41,13 @@ public class ProductController {
     @DeleteMapping("/product/{id}")
     public String deleteProduct(@PathVariable int id){
         if(productManager.deleteProduct(id)){
-            return "Product succecfully deleted";
+            return "Product successfully deleted";
         }
         return "Product not deleted Try again";
+    }
+    @GetMapping("/entropots")
+    public List<Entrepot> showEntrepots(){
+        return entropotManager.getAll();
     }
 
 }
