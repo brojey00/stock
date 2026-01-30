@@ -14,8 +14,9 @@ import java.util.List;
 public class Stock {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToMany
-    private List<Product> products;
+    @OneToOne
+    @JoinColumn(name ="product")
+    private Product product;
     private int quantity;
     @OneToOne
     private Entrepot entrepot;
