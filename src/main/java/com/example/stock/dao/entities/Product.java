@@ -17,7 +17,6 @@ public class Product {
     private int buy_price;
     private int sell_price;
     private String unit;
-    @OneToOne
-    private Stock stock;
+
 }
 

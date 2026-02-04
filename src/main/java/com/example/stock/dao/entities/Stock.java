@@ -14,11 +14,12 @@ import java.util.List;
 public class Stock {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
-    @JoinColumn(name ="product")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "produit_id", nullable = false)
     private Product product;
     private int quantity;
-    @OneToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "entrepot_id", nullable = false)
     private Entrepot entrepot;
     private int stock_alert;
 }

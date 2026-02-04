@@ -17,4 +17,7 @@ public class User {
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "entrepot_id", nullable = true)
+    private Entrepot entrepotAssigne;
 }

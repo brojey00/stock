@@ -1,11 +1,9 @@
 package com.example.stock.controllers.adminController;
 
 import com.example.stock.dao.entities.Entrepot;
-import com.example.stock.dao.entities.HistoriqueVente;
 import com.example.stock.dao.entities.Product;
 import com.example.stock.dao.entities.Stock;
 import com.example.stock.service.EntropotManager;
-import com.example.stock.service.HistoriqueVenteManager;
 import com.example.stock.service.ProductManager;
 import com.example.stock.service.StockManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +22,7 @@ public class HomeController {
     private EntropotManager entropotManager;
     @Autowired
     private StockManager stockManager;
-    @Autowired
-    private HistoriqueVenteManager historiqueVenteManager;
+
 
     // Product Management
     @GetMapping("/products")
@@ -94,8 +91,5 @@ public class HomeController {
         return stockManager.getAll();
     }
 
-    @GetMapping("/sales")
-    public List<HistoriqueVente> showSales(){
-        return historiqueVenteManager.getAll();
-    }
+
 }
