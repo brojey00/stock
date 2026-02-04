@@ -3,6 +3,7 @@ package com.example.stock.controllers.adminController;
 import com.example.stock.dao.entities.Entrepot;
 import com.example.stock.dao.entities.Product;
 import com.example.stock.dao.entities.Stock;
+import com.example.stock.dao.entities.User;
 import com.example.stock.service.EntropotManager;
 import com.example.stock.service.ProductManager;
 import com.example.stock.service.StockManager;
@@ -23,8 +24,6 @@ public class HomeController {
     @Autowired
     private StockManager stockManager;
 
-
-    // Product Management
     @GetMapping("/products")
     public List<Product> showProducts(){
         List<Product> list = productManager.getAll();
@@ -64,16 +63,19 @@ public class HomeController {
 
     @GetMapping("/entrepot/{id}")
     public Optional<Entrepot> showEntrepot(@PathVariable Integer id){
+
         return entropotManager.getById(id);
     }
 
     @PostMapping("/addentrepot")
     public Entrepot addEntrepot(@RequestBody Entrepot entrepot){
+
         return entropotManager.addEntrepot(entrepot);
     }
 
     @PutMapping("/updateentrepot")
     public Entrepot updateEntrepot(@RequestBody Entrepot entrepot){
+
         return entropotManager.updateEntrepot(entrepot);
     }
 
@@ -84,12 +86,5 @@ public class HomeController {
         }
         return "Entrepot not deleted Try again";
     }
-
-    // View Everything (Stocks, Sales/Previsions)
-    @GetMapping("/stocks")
-    public List<Stock> showStocks(){
-        return stockManager.getAll();
-    }
-
 
 }
