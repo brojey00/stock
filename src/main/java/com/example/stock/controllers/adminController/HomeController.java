@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @PreAuthorize("hasRole('ADMIN')")
-@RestController
+@RestController("api/admin")
 public class HomeController {
     @Autowired
     private ProductManager productManager;
