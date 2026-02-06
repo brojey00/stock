@@ -25,7 +25,7 @@ public class User implements UserDetails {
     private String email;
     private String password;
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role=Role.MANAGER;
     @ManyToOne
     @JoinColumn(name = "entrepot_id", nullable = true)
     private Entrepot entrepotAssigne;
