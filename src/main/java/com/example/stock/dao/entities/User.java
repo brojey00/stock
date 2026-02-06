@@ -20,7 +20,7 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id ;
+    private Integer id;
     private String fullname;
     private String email;
     private String password;
@@ -30,7 +30,6 @@ public class User implements UserDetails {
     @JoinColumn(name = "entrepot_id", nullable = true)
     private Entrepot entrepotAssigne;
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
@@ -38,7 +37,7 @@ public class User implements UserDetails {
 
     @Override
     public @Nullable String getPassword() {
-        return password ;
+        return password;
     }
 
     @Override

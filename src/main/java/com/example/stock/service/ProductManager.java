@@ -12,30 +12,39 @@ import java.util.Optional;
 
 @Service
 
-
 public class ProductManager {
     @Autowired
     private ProductRepository productRepository;
-    public List<Product> getAll(){
-        return productRepository.findAll();
+
+    public List<Product> getAll() {
+        List<Product> list = productRepository.findAll();
+        if (list.isEmpty()) {
+            return List.of();
+        }
+        return list;
     }
-    public Optional<Product> getById(int id){
+
+    public Optional<Product> getById(Integer id) {
         return productRepository.findById(id);
     }
-    public Product addProduct(Product product){ return productRepository.save(product);}
-    public Product updateProduct(Product product){
+
+    public Product addProduct(Product product) {
+        return productRepository.save(product);
+    }
+
+    public Product updateProduct(Product product) {
         Optional<Product> prod = productRepository.findById(product.getId());
-        if (prod.isEmpty() ){
+        if (prod.isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
-                    "Product does not exist"
-            );
+                    "Product does not exist");
         }
         return productRepository.save(product);
     }
-    public boolean deleteProduct(int id){
+
+    public boolean deleteProduct(int id) {
         productRepository.deleteById(id);
-        if (productRepository.findById(id).isPresent()){
+        if (productRepository.findById(id).isPresent()) {
             return false;
         }
         return true;

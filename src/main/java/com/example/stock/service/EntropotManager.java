@@ -15,32 +15,34 @@ public class EntropotManager {
     @Autowired
     private EntropotRepository entropotRepository;
 
-    public List<Entrepot> getAll(){
-        return entropotRepository.findAll();
+    public List<Entrepot> getAll() {
+        List<Entrepot> list = entropotRepository.findAll();
+        if (list.isEmpty()) {
+            return List.of();
+        }
+        return list;
     }
 
-    public Optional<Entrepot> getById(Integer id){
+    public Optional<Entrepot> getById(Integer id) {
         return entropotRepository.findById(id);
     }
 
-    public Entrepot addEntrepot(Entrepot entrepot){
+    public Entrepot addEntrepot(Entrepot entrepot) {
         return entropotRepository.save(entrepot);
     }
 
-    public Entrepot updateEntrepot(Entrepot entrepot){
+    public Entrepot updateEntrepot(Entrepot entrepot) {
         Optional<Entrepot> existing = entropotRepository.findById(entrepot.getId());
-        if (existing.isEmpty() ){
+        if (existing.isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
-                    "Entrepot does not exist"
-            );
+                    "Entrepot does not exist");
         }
         return entropotRepository.save(entrepot);
     }
 
-    public boolean deleteEntrepot(Integer id){
+    public boolean deleteEntrepot(Integer id) {
         entropotRepository.deleteById(id);
         return entropotRepository.findById(id).isEmpty();
     }
 }
-
