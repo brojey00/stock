@@ -4,10 +4,9 @@ import com.example.stock.dao.entities.Entrepot;
 import com.example.stock.dao.entities.Product;
 import com.example.stock.dao.entities.Stock;
 import com.example.stock.dao.entities.User;
-import com.example.stock.service.StockManager;
-import com.example.stock.service.EntropotManager;
-import com.example.stock.service.ProductManager;
-import com.example.stock.service.UserManager;
+import com.example.stock.dto.AuthResponse;
+import com.example.stock.dto.RegisterRequest;
+import com.example.stock.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@PreAuthorize("hasRole('ADMIN')")
-@RestController("api/admin")
+
+@RestController
+@RequestMapping("/")
 public class HomeController {
     @Autowired
     private ProductManager productManager;
@@ -26,7 +26,9 @@ public class HomeController {
     private StockManager stockManager;
     @Autowired
     private UserManager userManager;
-
+    @Autowired
+    private AuthService authService;
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/products")
     public List<Product> showProducts() {
         return productManager.getAll();
@@ -42,7 +44,7 @@ public class HomeController {
         return productManager.addProduct(product);
     }
 
-    @PutMapping("/updateproduct")
+    @PatchMapping("/updateproduct")
     public Product updateProduct(@RequestBody Product product) {
         return productManager.updateProduct(product);
     }
@@ -55,7 +57,7 @@ public class HomeController {
         return "Product not deleted Try again";
     }
 
-    @GetMapping("/entropots")
+    @GetMapping("/entrepots")
     public List<Entrepot> showEntrepots() {
         return entropotManager.getAll();
     }
@@ -70,7 +72,7 @@ public class HomeController {
         return entropotManager.addEntrepot(entrepot);
     }
 
-    @PutMapping("/updateentrepot")
+    @PatchMapping("/updateentrepot")
     public Entrepot updateEntrepot(@RequestBody Entrepot entrepot) {
 
         return entropotManager.updateEntrepot(entrepot);
@@ -99,7 +101,7 @@ public class HomeController {
         return stockManager.addStock(stock);
     }
 
-    @PutMapping("/updatestock")
+    @PatchMapping("/updatestock")
     public Stock updateStock(@RequestBody Stock stock) {
         return stockManager.updateStock(stock);
     }
@@ -119,16 +121,16 @@ public class HomeController {
     public Optional<User> showUser(@PathVariable Integer id){
         return userManager.getById(id);
     }
-    @PostMapping("/adduser")
-    public User addUser(@RequestBody User user){
-        return userManager.addUser(user);
+    @PatchMapping("/adduser")
+    public AuthResponse addUser(@RequestBody RegisterRequest registerRequest){
+        return authService.register(registerRequest);
     }
-    @PutMapping("/updateuser")
+    @PatchMapping("/updateuser")
     public User updateUser(@RequestBody User user){
         return userManager.updateUser(user);
     }
     @DeleteMapping("/deleteuser/{id}")
-    public String deleteUser(Integer id){
+    public String deleteUser(@PathVariable Integer id){
         if (userManager.deleteUser(id)){
             return "User deleted ";
         }

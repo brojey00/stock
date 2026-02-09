@@ -1,6 +1,10 @@
 package com.example.stock.service;
 
+import com.example.stock.dao.entities.Entrepot;
+import com.example.stock.dao.entities.Product;
 import com.example.stock.dao.entities.Stock;
+import com.example.stock.dao.repositories.EntropotRepository;
+import com.example.stock.dao.repositories.ProductRepository;
 import com.example.stock.dao.repositories.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +17,10 @@ import org.springframework.web.server.ResponseStatusException;
 public class StockManager {
     @Autowired
     private StockRepository stockRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private EntropotRepository entrepotRepository;
 
     public List<Stock> getAll() {
         List<Stock> list = stockRepository.findAll();
@@ -27,6 +35,33 @@ public class StockManager {
     }
 
     public Stock addStock(Stock stock) {
+        if (stock.getProduct() == null || stock.getProduct().getId() == null) {
+            throw new RuntimeException("Product ID is required");
+        }
+
+        Product product = productRepository.findById(stock.getProduct().getId())
+                .orElseThrow(() -> new RuntimeException("Product not found with ID: " + stock.getProduct().getId()));
+
+        // Validate that entrepot exists and fetch full entity
+        if (stock.getEntrepot() == null || stock.getEntrepot().getId() == null) {
+            throw new RuntimeException("Entrepot ID is required");
+        }
+
+        Entrepot entrepot = entrepotRepository.findById(stock.getEntrepot().getId())
+                .orElseThrow(() -> new RuntimeException("Entrepot not found with ID: " + stock.getEntrepot().getId()));
+
+        // Check if stock already exists for this product-entrepot combination
+        Optional<Stock> existingStock = stockRepository.findByProductIdAndEntrepotId(
+                product.getId(),
+                entrepot.getId()
+        );
+
+        if (existingStock.isPresent()) {
+            throw new RuntimeException("Stock already exists for this product in this entrepot. Use update instead.");
+        }
+        stock.setProduct(product);
+        stock.setEntrepot(entrepot);
+
         return stockRepository.save(stock);
     }
 

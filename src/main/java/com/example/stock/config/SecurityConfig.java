@@ -24,39 +24,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF for REST API (stateless)
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // Stateless session - no server-side session storage
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                // RBAC Authorization Rules
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll())
-                        // ═══════════════════════════════════════════════════════════
-                        // PUBLIC ENDPOINTS - No authentication required
-                        // ═══════════════════════════════════════════════════════════
-
-
-                        // ═══════════════════════════════════════════════════════════
-                        // DEFAULT - Require authentication for any other request
-                        // ═══════════════════════════════════════════════════════════
-
-
-                // Use custom UserDetailsService for authentication
                 .userDetailsService(userDetailsService)
-
-                // HTTP Basic Authentication for API testing
                 .httpBasic(basic -> {
                 });
 
         return http.build();
     }
-
-    /**
-     * Password encoder using BCrypt algorithm
-     * BCrypt automatically handles salting and is resistant to brute-force attacks
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);

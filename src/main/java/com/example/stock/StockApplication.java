@@ -10,15 +10,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class StockApplication {
-    /*@Autowired
-    private UserRepository userRepository;*/
+
     public static void main(String[] args) {
         SpringApplication.run(StockApplication.class, args);
     }
-    /*@Override
-    public void run(String... args) throws Exception{
 
-        User user1=new User(null,"SI 7AMID","si7amid@gmail.com","si7amid", Role.ADMIN,null);
-        userRepository.save(user1);
-    }*/
 }

@@ -1,5 +1,6 @@
 package com.example.stock.dao.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,10 +16,12 @@ public class Stock {
     private Integer id;
     @ManyToOne(optional = false)
     @JoinColumn(name = "produit_id", nullable = false)
+    @JsonIgnoreProperties({"buy_price", "sell_price", "Description", "Category","name","unit"})
     private Product product;
-    private int quantity;
+    private Integer quantity;
     @ManyToOne(optional = false)
     @JoinColumn(name = "entrepot_id", nullable = false)
+    @JsonIgnoreProperties({"location", "city","name"})
     private Entrepot entrepot;
-    private int stock_alert;
+    private Integer stockAlert;
 }

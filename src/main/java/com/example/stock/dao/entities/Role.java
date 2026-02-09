@@ -1,5 +1,5 @@
 package com.example.stock.dao.entities;
 
 public enum Role {
-    ADMIN, MANAGER
+    ADMIN, MANAGER;
 }

@@ -32,13 +32,17 @@ public class EntropotManager {
     }
 
     public Entrepot updateEntrepot(Entrepot entrepot) {
-        Optional<Entrepot> existing = entropotRepository.findById(entrepot.getId());
-        if (existing.isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Entrepot does not exist");
+        Entrepot existing = entropotRepository.findById(entrepot.getId()).orElseThrow(()->new RuntimeException("warehouse does not exist"));
+        if(entrepot.getCity()!=null){
+            existing.setCity(entrepot.getCity());
         }
-        return entropotRepository.save(entrepot);
+        if(entrepot.getLocation()!=null){
+            existing.setLocation(entrepot.getLocation());
+        }
+        if(entrepot.getName()!=null){
+            existing.setName(entrepot.getName());
+        }
+        return entropotRepository.save(existing);
     }
 
     public boolean deleteEntrepot(Integer id) {
