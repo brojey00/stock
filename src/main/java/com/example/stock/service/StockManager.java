@@ -1,18 +1,18 @@
 package com.example.stock.service;
 
-import com.example.stock.dao.entities.Entrepot;
-import com.example.stock.dao.entities.Product;
-import com.example.stock.dao.entities.Stock;
+import com.example.stock.dao.entities.*;
 import com.example.stock.dao.repositories.EntropotRepository;
 import com.example.stock.dao.repositories.ProductRepository;
 import com.example.stock.dao.repositories.StockRepository;
+import com.example.stock.dao.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.List;
 import org.springframework.web.server.ResponseStatusException;
-
+@PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER'))")
 @Service
 public class StockManager {
     @Autowired
@@ -21,6 +21,8 @@ public class StockManager {
     private ProductRepository productRepository;
     @Autowired
     private EntropotRepository entrepotRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public List<Stock> getAll() {
         List<Stock> list = stockRepository.findAll();
@@ -28,6 +30,17 @@ public class StockManager {
             return List.of();
         }
         return list;
+    }
+    public List<Stock> getStocksOfWarehouse(Integer userId){
+        User user=userRepository.findById(userId).orElseThrow(()->new RuntimeException("this user does not exist"));
+        if(user.getEntrepotAssigne()!=null){
+            List<Stock> list = stockRepository.findStocksByEntrepot(user.getEntrepotAssigne());
+            if (list.isEmpty() ) {
+                return List.of();
+            }
+            return list;
+        }
+        throw new RuntimeException("the manager is not assigned to no warehouse");
     }
 
     public Optional<Stock> getById(Integer id) {
@@ -65,18 +78,25 @@ public class StockManager {
         return stockRepository.save(stock);
     }
 
-    public Stock updateStock(Stock stock) {
-        Optional<Stock> existing = stockRepository.findById(stock.getId());
-        if (existing.isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Stock does not exist");
+    public Stock updateStock(int user_id,Stock stock) {
+        User user = userRepository.findById(user_id).orElseThrow(()->new RuntimeException("this user does not exist"));
+        Stock existing = stockRepository.findById(stock.getId()).orElseThrow(()->new RuntimeException("this stock does not exist"));
+        if(user.getEntrepotAssigne().getId().equals(existing.getEntrepot().getId()) || user.getRole()==Role.ADMIN){
+            if(stock.getQuantity()!=null){
+                existing.setQuantity(stock.getQuantity());
+            }
+            if(stock.getStockAlert()!=null){
+                existing.setStockAlert(stock.getStockAlert());
+            }
+
         }
-        return stockRepository.save(stock);
+        return stockRepository.save(existing);
+
     }
 
     public boolean deleteStock(Integer id) {
         stockRepository.deleteById(id);
         return stockRepository.findById(id).isEmpty();
     }
+
 }

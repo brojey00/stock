@@ -29,10 +29,10 @@ public class AuthService {
         String encryptedPassword = passwordEncoder.encode(request.getPassword());
         user.setPassword(encryptedPassword);
         user.setRole(request.getRole());
+        // Return response
 
         User savedUser = userRepository.save(user);
 
-        // Return response
         return AuthResponse.builder()
                 .id(savedUser.getId())
                 .username(savedUser.getUsername())
@@ -42,21 +42,16 @@ public class AuthService {
                 .build();
     }
     public AuthResponse login(LoginRequest request) {
-        // Find user by email
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
 
-        // ★★★ VERIFY PASSWORD USING BCRYPT ★★★
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("Invalid email or password");
         }
-
-        // Check if account is enabled
         if (!user.isEnabled()) {
             throw new RuntimeException("Account is disabled");
         }
 
-        // Return response
         return AuthResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
@@ -65,36 +60,23 @@ public class AuthService {
                 .message("Login successful!")
                 .build();
     }
-
-    /**
-     * Change user password
-     */
     @Transactional
     public void changePassword(String email, String oldPassword, String newPassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Verify old password
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new BadCredentialsException("Old password is incorrect");
         }
-
-        // Encrypt and set new password
         String encryptedNewPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encryptedNewPassword);
 
         userRepository.save(user);
     }
-
-    /**
-     * Reset password (for admin or forgot password functionality)
-     */
     @Transactional
     public void resetPassword(String email, String newPassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Encrypt and set new password
         String encryptedPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encryptedPassword);
 

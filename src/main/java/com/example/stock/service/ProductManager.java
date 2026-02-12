@@ -16,9 +16,11 @@ public class ProductManager {
     @Autowired
     private ProductRepository productRepository;
 
+
+
     public List<Product> getAll() {
         List<Product> list = productRepository.findAll();
-        if (list.isEmpty()) {
+        if (list.isEmpty() ) {
             return List.of();
         }
         return list;

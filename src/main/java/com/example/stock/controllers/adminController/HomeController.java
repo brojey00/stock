@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequestMapping("/")
 public class HomeController {
@@ -28,7 +28,6 @@ public class HomeController {
     private UserManager userManager;
     @Autowired
     private AuthService authService;
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/products")
     public List<Product> showProducts() {
         return productManager.getAll();
@@ -101,9 +100,9 @@ public class HomeController {
         return stockManager.addStock(stock);
     }
 
-    @PatchMapping("/updatestock")
-    public Stock updateStock(@RequestBody Stock stock) {
-        return stockManager.updateStock(stock);
+    @PatchMapping("/updatestock/{user_id}")
+    public Stock updateStock(@PathVariable int user_id,@RequestBody Stock stock) {
+        return stockManager.updateStock(user_id,stock);
     }
 
     @DeleteMapping("/stock/{id}")
