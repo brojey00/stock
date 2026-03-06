@@ -33,7 +33,7 @@ public class StockManager {
     }
     public List<Stock> getStocksOfWarehouse(Integer userId){
         User user=userRepository.findById(userId).orElseThrow(()->new RuntimeException("this user does not exist"));
-        if(user.getEntrepotAssigne()!=null){
+        if(user.getEntrepotAssigne()!=null ){
             List<Stock> list = stockRepository.findStocksByEntrepot(user.getEntrepotAssigne());
             if (list.isEmpty() ) {
                 return List.of();
@@ -81,17 +81,35 @@ public class StockManager {
     public Stock updateStock(int user_id,Stock stock) {
         User user = userRepository.findById(user_id).orElseThrow(()->new RuntimeException("this user does not exist"));
         Stock existing = stockRepository.findById(stock.getId()).orElseThrow(()->new RuntimeException("this stock does not exist"));
-        if(user.getEntrepotAssigne().getId().equals(existing.getEntrepot().getId()) || user.getRole()==Role.ADMIN){
+        
+        // Check authorization
+        if(user.getRole() == Role.ADMIN){
+            // Admin can update any stock
             if(stock.getQuantity()!=null){
                 existing.setQuantity(stock.getQuantity());
             }
             if(stock.getStockAlert()!=null){
                 existing.setStockAlert(stock.getStockAlert());
             }
-
+        } else if(user.getRole() == Role.MANAGER){
+            // Manager can only update stock in their assigned warehouse
+            if(user.getEntrepotAssigne() == null){
+                throw new RuntimeException("Manager is not assigned to any warehouse");
+            }
+            if(!user.getEntrepotAssigne().getId().equals(existing.getEntrepot().getId())){
+                throw new RuntimeException("Manager can only update stock in their assigned warehouse");
+            }
+            if(stock.getQuantity()!=null){
+                existing.setQuantity(stock.getQuantity());
+            }
+            if(stock.getStockAlert()!=null){
+                existing.setStockAlert(stock.getStockAlert());
+            }
+        } else {
+            throw new RuntimeException("User does not have permission to update stock");
         }
+        
         return stockRepository.save(existing);
-
     }
 
     public boolean deleteStock(Integer id) {

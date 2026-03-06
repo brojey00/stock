@@ -15,9 +15,6 @@ import java.util.Optional;
 public class ProductManager {
     @Autowired
     private ProductRepository productRepository;
-
-
-
     public List<Product> getAll() {
         List<Product> list = productRepository.findAll();
         if (list.isEmpty() ) {
@@ -35,20 +32,36 @@ public class ProductManager {
     }
 
     public Product updateProduct(Product product) {
-        Optional<Product> prod = productRepository.findById(product.getId());
-        if (prod.isEmpty()) {
-            throw new ResponseStatusException(
+        Product existing = productRepository.findById(product.getId())
+                .orElseThrow(() -> new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
-                    "Product does not exist");
+                    "Product does not exist"));
+        
+        // Partial update - only update provided fields
+        if(product.getName() != null){
+            existing.setName(product.getName());
         }
-        return productRepository.save(product);
+        if(product.getDescription() != null){
+            existing.setDescription(product.getDescription());
+        }
+        if(product.getCategory() != null){
+            existing.setCategory(product.getCategory());
+        }
+        if(product.getUnit() != null){
+            existing.setUnit(product.getUnit());
+        }
+        if(product.getBuy_price() != null){
+            existing.setBuy_price(product.getBuy_price());
+        }
+        if(product.getSell_price() != null){
+            existing.setSell_price(product.getSell_price());
+        }
+        
+        return productRepository.save(existing);
     }
 
     public boolean deleteProduct(int id) {
         productRepository.deleteById(id);
-        if (productRepository.findById(id).isPresent()) {
-            return false;
-        }
-        return true;
+        return productRepository.findById(id).isEmpty();
     }
 }

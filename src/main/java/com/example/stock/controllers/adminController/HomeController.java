@@ -120,7 +120,7 @@ public class HomeController {
     public Optional<User> showUser(@PathVariable Integer id){
         return userManager.getById(id);
     }
-    @PatchMapping("/adduser")
+    @PostMapping("/adduser")
     public AuthResponse addUser(@RequestBody RegisterRequest registerRequest){
         return authService.register(registerRequest);
     }
@@ -135,14 +135,14 @@ public class HomeController {
         }
         return "User not deleted try again ";
     }
-    @PatchMapping("assign-warehouse/{user_id}/{warehouse_id}")
+    @PutMapping("assign-warehouse/{user_id}/{warehouse_id}")
     public String assignWarehouseToUser(@PathVariable Integer user_id,@PathVariable Integer warehouse_id){
         if(userManager.assignUserToEntrepot(user_id,warehouse_id)){
             return "Warehouse added to the user ";
         }
         return "Not added try again";
     }
-    @PatchMapping("remove-warehouse/{user_id}")
+    @PutMapping("remove-warehouse/{user_id}")
     public String removeWarehouseFromUser(@PathVariable Integer user_id){
         if(userManager.removeUserFromWarehouse(user_id)){
             return "Warehouse removed from the manager";

@@ -38,6 +38,19 @@ public class UserManager {
 
     public User updateUser(User user) {
         User userToUpdate=userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // Update fields if they are provided
+        if(user.getFullname() != null){
+            userToUpdate.setFullname(user.getFullname());
+        }
+        if(user.getEmail() != null){
+            userToUpdate.setEmail(user.getEmail());
+        }
+        if(user.getRole() != null){
+            userToUpdate.setRole(user.getRole());
+        }
+        // Note: Password updates should go through AuthService.changePassword for security
+        
         return userRepository.save(userToUpdate);
     }
     public boolean deleteUser(Integer id) {
@@ -57,6 +70,7 @@ public class UserManager {
     public boolean removeUserFromWarehouse(Integer userId){
         User user = userRepository.findById(userId).orElseThrow(()->new RuntimeException("user does not exist"));
         user.setEntrepotAssigne(null);
+        userRepository.save(user);
         return user.getEntrepotAssigne() == null;
     }
 

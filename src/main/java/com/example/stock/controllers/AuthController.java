@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
-    @PatchMapping("/register")
+    @PostMapping("/register")
     public AuthResponse register(@RequestBody RegisterRequest registerRequest){
         return authService.register(registerRequest);
     }
