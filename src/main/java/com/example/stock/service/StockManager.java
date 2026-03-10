@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.List;
 import org.springframework.web.server.ResponseStatusException;
-@PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER'))")
+//@PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER'))")
 @Service
 public class StockManager {
     @Autowired

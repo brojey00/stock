@@ -9,6 +9,7 @@ import com.example.stock.dto.RegisterRequest;
 import com.example.stock.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.Optional;
 
 @PreAuthorize("hasRole('ADMIN')")
 @RestController
-@RequestMapping("/")
+@RequestMapping("/admin")
 public class HomeController {
     @Autowired
     private ProductManager productManager;
@@ -32,7 +33,6 @@ public class HomeController {
     public List<Product> showProducts() {
         return productManager.getAll();
     }
-
     @GetMapping("/product/{id}")
     public Optional<Product> showProduct(@PathVariable Integer id) {
         return productManager.getById(id);
@@ -135,7 +135,7 @@ public class HomeController {
         }
         return "User not deleted try again ";
     }
-    @PutMapping("assign-warehouse/{user_id}/{warehouse_id}")
+    @PutMapping("/assign-warehouse/{user_id}/{warehouse_id}")
     public String assignWarehouseToUser(@PathVariable Integer user_id,@PathVariable Integer warehouse_id){
         if(userManager.assignUserToEntrepot(user_id,warehouse_id)){
             return "Warehouse added to the user ";

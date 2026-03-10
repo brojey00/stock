@@ -1,6 +1,7 @@
 package com.example.stock.service;
 
 import com.example.stock.dao.entities.Product;
+import com.example.stock.dao.repositories.EntropotRepository;
 import com.example.stock.dao.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,12 +16,16 @@ import java.util.Optional;
 public class ProductManager {
     @Autowired
     private ProductRepository productRepository;
+
     public List<Product> getAll() {
-        List<Product> list = productRepository.findAll();
-        if (list.isEmpty() ) {
-            return List.of();
-        }
-        return list;
+
+            List<Product> list = productRepository.findAll();
+            if (list.isEmpty() ) {
+                return List.of();
+            }
+            return list;
+
+
     }
 
     public Optional<Product> getById(Integer id) {
