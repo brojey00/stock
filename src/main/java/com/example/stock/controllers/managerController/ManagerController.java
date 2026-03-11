@@ -1,10 +1,15 @@
 package com.example.stock.controllers.managerController;
 
+import com.example.stock.dao.entities.HistoriqueVente;
 import com.example.stock.dao.entities.Stock;
 import com.example.stock.dao.entities.User;
+import com.example.stock.dto.ProductDto;
+import com.example.stock.dto.VenteRequest;
+import com.example.stock.dto.VenteResponse;
 import com.example.stock.service.EntropotManager;
 import com.example.stock.service.ProductManager;
 import com.example.stock.service.StockManager;
+import com.example.stock.service.VenteManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,17 +27,34 @@ public class ManagerController {
     private EntropotManager entropotManager;
     @Autowired
     private StockManager stockManager;
+    @Autowired
+    private VenteManager venteManager;
 
     @GetMapping("/stocks")
     public List<Stock> showstocks(@AuthenticationPrincipal User user){
-        System.out.println("Username: " + user.getUsername());
-        System.out.println("Authorities: " + user.getAuthorities());
-        return stockManager.getStocksOfWarehouse(user.getId());
+        return stockManager.getStocksOfWarehouse(user);
     }
 
-    @PatchMapping("/updatestock/{user_id}")
-    public Stock updateStock(@PathVariable int user_id,@RequestBody Stock stock){
-        return stockManager.updateStock(user_id,stock);
-
+    @PatchMapping("/stocks/{id}")
+    public Stock updateStock(@AuthenticationPrincipal User user, @PathVariable int id, @RequestBody Stock stock){
+        stock.setId(id);
+        return stockManager.updateStock(user, stock);
     }
+
+    @GetMapping("/products")
+    public List<ProductDto> showproducts(@AuthenticationPrincipal User user){
+        return productManager.getProductsByWarehouse(user);
+    }
+
+
+    @PostMapping("/ventes")
+    public HistoriqueVente vendre(@AuthenticationPrincipal User user, @RequestBody VenteRequest request) {
+        return venteManager.vendre(user, request.getProductId(), null, request.getQuantity());
+    }
+
+    @GetMapping("/ventes")
+    public List<VenteResponse> getVentes(@AuthenticationPrincipal User user) {
+        return venteManager.getHistorique(user);
+    }
+
 }

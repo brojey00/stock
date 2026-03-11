@@ -6,6 +6,9 @@ import com.example.stock.dao.entities.Stock;
 import com.example.stock.dao.entities.User;
 import com.example.stock.dto.AuthResponse;
 import com.example.stock.dto.RegisterRequest;
+import com.example.stock.dto.VenteRequest;
+import com.example.stock.dao.entities.HistoriqueVente;
+import com.example.stock.dto.VenteResponse;
 import com.example.stock.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,26 +32,29 @@ public class HomeController {
     private UserManager userManager;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private VenteManager venteManager;
     @GetMapping("/products")
     public List<Product> showProducts() {
         return productManager.getAll();
     }
-    @GetMapping("/product/{id}")
+    @GetMapping("/products/{id}")
     public Optional<Product> showProduct(@PathVariable Integer id) {
         return productManager.getById(id);
     }
 
-    @PostMapping("/addproduct")
+    @PostMapping("/products")
     public Product addProduct(@RequestBody Product product) {
         return productManager.addProduct(product);
     }
 
-    @PatchMapping("/updateproduct")
-    public Product updateProduct(@RequestBody Product product) {
+    @PatchMapping("/products/{id}")
+    public Product updateProduct(@PathVariable Integer id, @RequestBody Product product) {
+        product.setId(id);
         return productManager.updateProduct(product);
     }
 
-    @DeleteMapping("/product/{id}")
+    @DeleteMapping("/products/{id}")
     public String deleteProduct(@PathVariable int id) {
         if (productManager.deleteProduct(id)) {
             return "Product successfully deleted";
@@ -61,23 +67,23 @@ public class HomeController {
         return entropotManager.getAll();
     }
 
-    @GetMapping("/entrepot/{id}")
+    @GetMapping("/entrepots/{id}")
     public Optional<Entrepot> showEntrepot(@PathVariable Integer id) {
         return entropotManager.getById(id);
     }
 
-    @PostMapping("/addentrepot")
+    @PostMapping("/entrepots")
     public Entrepot addEntrepot(@RequestBody Entrepot entrepot) {
         return entropotManager.addEntrepot(entrepot);
     }
 
-    @PatchMapping("/updateentrepot")
-    public Entrepot updateEntrepot(@RequestBody Entrepot entrepot) {
-
+    @PatchMapping("/entrepots/{id}")
+    public Entrepot updateEntrepot(@PathVariable Integer id, @RequestBody Entrepot entrepot) {
+        entrepot.setId(id);
         return entropotManager.updateEntrepot(entrepot);
     }
 
-    @DeleteMapping("/entrepot/{id}")
+    @DeleteMapping("/entrepots/{id}")
     public String deleteEntrepot(@PathVariable Integer id) {
         if (entropotManager.deleteEntrepot(id)) {
             return "Entrepot successfully deleted";
@@ -90,22 +96,23 @@ public class HomeController {
         return stockManager.getAll();
     }
 
-    @GetMapping("/stock/{id}")
+    @GetMapping("/stocks/{id}")
     public Optional<Stock> showStock(@PathVariable Integer id) {
         return stockManager.getById(id);
     }
 
-    @PostMapping("/addstock")
+    @PostMapping("/stocks")
     public Stock addStock(@RequestBody Stock stock) {
         return stockManager.addStock(stock);
     }
 
-    @PatchMapping("/updatestock/{user_id}")
-    public Stock updateStock(@PathVariable int user_id,@RequestBody Stock stock) {
-        return stockManager.updateStock(user_id,stock);
+    @PatchMapping("/stocks/{id}")
+    public Stock updateStock(@AuthenticationPrincipal User user, @PathVariable int id, @RequestBody Stock stock) {
+        stock.setId(id);
+        return stockManager.updateStock(user, stock);
     }
 
-    @DeleteMapping("/stock/{id}")
+    @DeleteMapping("/stocks/{id}")
     public String deleteStock(@PathVariable Integer id) {
         if (stockManager.deleteStock(id)) {
             return "Stock successfully deleted";
@@ -116,33 +123,49 @@ public class HomeController {
     public List<User> showUsers(){
         return userManager.getAll();
     }
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
     public Optional<User> showUser(@PathVariable Integer id){
         return userManager.getById(id);
     }
-    @PostMapping("/adduser")
+    @PostMapping("/users")
     public AuthResponse addUser(@RequestBody RegisterRequest registerRequest){
         return authService.register(registerRequest);
     }
-    @PatchMapping("/updateuser")
-    public User updateUser(@RequestBody User user){
+    @PatchMapping("/users/{id}")
+    public User updateUser(@PathVariable Integer id, @RequestBody User user){
+        user.setId(id);
         return userManager.updateUser(user);
     }
-    @DeleteMapping("/deleteuser/{id}")
+    @DeleteMapping("/users/{id}")
     public String deleteUser(@PathVariable Integer id){
         if (userManager.deleteUser(id)){
             return "User deleted ";
         }
         return "User not deleted try again ";
     }
-    @PutMapping("/assign-warehouse/{user_id}/{warehouse_id}")
-    public String assignWarehouseToUser(@PathVariable Integer user_id,@PathVariable Integer warehouse_id){
+    @PostMapping("/ventes")
+    public HistoriqueVente vendre(@AuthenticationPrincipal User user, @RequestBody VenteRequest request) {
+        return venteManager.vendre(user, request.getProductId(), request.getEntrepotId(), request.getQuantity());
+    }
+
+    @GetMapping("/ventes")
+    public List<VenteResponse> getAllVentes(@AuthenticationPrincipal User user) {
+        return venteManager.getHistorique(user);
+    }
+
+    @GetMapping("/ventes/entrepots/{id}")
+    public List<VenteResponse> getVentesByEntrepot(@PathVariable Integer id) {
+        return venteManager.getHistoriqueByEntrepot(id);
+    }
+
+    @PutMapping("/users/{user_id}/warehouse/{warehouse_id}")
+    public String assignWarehouseToUser(@PathVariable Integer user_id, @PathVariable Integer warehouse_id){
         if(userManager.assignUserToEntrepot(user_id,warehouse_id)){
             return "Warehouse added to the user ";
         }
         return "Not added try again";
     }
-    @PutMapping("remove-warehouse/{user_id}")
+    @DeleteMapping("/users/{user_id}/warehouse")
     public String removeWarehouseFromUser(@PathVariable Integer user_id){
         if(userManager.removeUserFromWarehouse(user_id)){
             return "Warehouse removed from the manager";
