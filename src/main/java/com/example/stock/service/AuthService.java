@@ -21,10 +21,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -79,7 +76,9 @@ public class AuthService {
         user.setFullname(request.getFullname());
         user.setEmail(request.getEmail());
         user.setRole(role);
+        user.setKeycloakId(keycloakUserId);
         User savedUser = userRepository.save(user);
+
 
         TokenPayload userTokens = requestToken(
                 keycloakRealm,
@@ -94,22 +93,26 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         TokenPayload tokenPayload = requestToken(
                 keycloakRealm,
-                keycloakClientSecret,
                 keycloakClientId,
+                keycloakClientSecret,
                 request.getEmail(),
                 request.getPassword()
         );
 
-        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
-        if (userOptional.isEmpty()) {
-            User shadowUser = new User();
-            shadowUser.setEmail(request.getEmail());
-            shadowUser.setFullname(request.getEmail());
-            shadowUser.setRole(Role.MANAGER);
-            return buildAuthResponse(shadowUser, tokenPayload, "Login successful (no local profile found)");
-        }
+        String adminAccessToken = requestToken(
+                keycloakAdminRealm,
+                keycloakAdminClientId,
+                null,
+                keycloakAdminUsername,
+                keycloakAdminPassword
+        ).accessToken();
 
-        return buildAuthResponse(userOptional.get(), tokenPayload, "Login successful!");
+        String keycloakUserId = findKeycloakUserIdByEmail(adminAccessToken, request.getEmail());
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseGet(() -> createLocalUserFromKeycloak(request.getEmail(), keycloakUserId));
+
+        return buildAuthResponse(user, tokenPayload, "Login successful!");
     }
 
     @Transactional
@@ -267,5 +270,16 @@ public class AuthService {
             @com.fasterxml.jackson.annotation.JsonProperty("token_type") String tokenType,
             @com.fasterxml.jackson.annotation.JsonProperty("expires_in") Long expiresIn
     ) {
+    }
+    private User createLocalUserFromKeycloak(String email, String keycloakUserId) {
+        User user = new User();
+        user.setEmail(email);
+        user.setFullname(email); // or fetch from Keycloak if needed
+        user.setKeycloakId(keycloakUserId);
+
+        // Default role (important)
+        user.setRole(Role.MANAGER);
+
+        return userRepository.save(user);
     }
 }

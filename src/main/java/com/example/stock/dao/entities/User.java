@@ -23,11 +23,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String fullname;
-    @Column(nullable = false, unique = true, length = 36)
-    private UUID keycloakId;
+    @Column(nullable = false, unique = true, columnDefinition = "VARCHAR(36)")
+    private String keycloakId;
     private String email;
     @Enumerated(EnumType.STRING)
-    private Role role=Role.MANAGER;
+    private Role role = Role.MANAGER;
     @ManyToOne
     @JoinColumn(name = "entrepot_id", nullable = true)
     private Entrepot entrepotAssigne;

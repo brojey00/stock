@@ -12,14 +12,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
 
-    @GetMapping("/info")
-    public Authentication register(Authentication authentication){
-        return authentication;
+    @PostMapping("/register")
+    public AuthResponse register(@Valid @RequestBody RegisterRequest registerRequest){
+        return authService.register(registerRequest);
     }
 
     @PostMapping("/login")

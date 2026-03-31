@@ -34,6 +34,8 @@ public class HomeController {
     private AuthService authService;
     @Autowired
     private VenteManager venteManager;
+    @Autowired
+    private Securityutils securityutils;
     @GetMapping("/products")
     public List<Product> showProducts() {
         return productManager.getAll();
@@ -107,9 +109,9 @@ public class HomeController {
     }
 
     @PatchMapping("/stocks/{id}")
-    public Stock updateStock(@AuthenticationPrincipal User user, @PathVariable int id, @RequestBody Stock stock) {
+    public Stock updateStock(@PathVariable int id, @RequestBody Stock stock) {
         stock.setId(id);
-        return stockManager.updateStock(user, stock);
+        return stockManager.updateStock(securityutils.getCurrentUser(),stock);
     }
 
     @DeleteMapping("/stocks/{id}")
