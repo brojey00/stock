@@ -6,7 +6,7 @@ This project is a Spring Boot-based Stock Management System designed to handle m
 ## User Roles and Access Control
 - Administrator (ADMIN): Has full access to the system, including user management, product catalog maintenance, warehouse configuration, and global stock oversight.
 - Warehouse Manager (MANAGER): Has restricted access to view and update stock levels only for the warehouse they are specifically assigned to.
-- Authentication: Secure login and registration system with password encryption using BCrypt and stateless session management.
+- Authentication: Secure login and registration integrated with Keycloak (OIDC), with stateless JWT validation in the API.
 
 ## Functional Requirements
 

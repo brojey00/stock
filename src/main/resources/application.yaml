@@ -8,10 +8,28 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
       hibernate:
-        ddl-auto: update
-      show-sql: true
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.MySQLDialect
+  # Point Spring to your Keycloak realm's issuer URI
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/AppRealm
+          jwk-set-uri: http://localhost:8180/realms/AppRealm/protocol/openid-connect/certs
 
+app:
+  keycloak:
+    server-url: http://localhost:8180
+    realm: AppRealm
+    client-id: stock-app
+    client-secret: hWDjDJzgUaEZKnAvDhb33xWiT5RwrwsO
+    admin:
+      realm: master
+      client-id: admin-cli
+      username: admin
+      password: admin

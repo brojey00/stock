@@ -1,0 +1,51 @@
+services:
+  # Database for Keycloak
+  keycloak-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: keycloak_db
+      POSTGRES_USER: keycloak_admin
+      POSTGRES_PASSWORD: keycloak_password
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak_admin -d keycloak_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Database for Spring Boot App
+  app-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: mydb
+      MYSQL_ROOT_PASSWORD: rachid
+    volumes:
+      - app_mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306" # Only if you need to connect via Workbench/DBeaver
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -prachid"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: start-dev  # Mapping internal port to 8180
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak_db
+      KC_DB_USERNAME: keycloak_admin
+      KC_DB_PASSWORD: keycloak_password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8180:8080"
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+
+volumes:
+  keycloak_postgres_data:
+  app_mysql_data:
