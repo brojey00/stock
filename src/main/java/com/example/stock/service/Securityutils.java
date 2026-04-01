@@ -31,9 +31,9 @@ public class Securityutils {
             throw new AccessDeniedException("JWT is missing 'sub' claim");
         }
 
-        UUID keycloakId;
+        String keycloakId;
         try {
-            keycloakId = UUID.fromString(sub);
+            keycloakId = sub;
         } catch (IllegalArgumentException e) {
             throw new AccessDeniedException("JWT 'sub' is not a valid UUID: " + sub);
         }

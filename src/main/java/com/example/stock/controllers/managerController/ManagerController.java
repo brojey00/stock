@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/manager")
 @PreAuthorize("hasRole('MANAGER')")
+@RequestMapping("/manager")
+//@PreAuthorize("hasRole('MANAGER')")
 public class ManagerController {
     @Autowired
     private ProductManager productManager;
